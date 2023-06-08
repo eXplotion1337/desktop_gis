@@ -7,6 +7,8 @@ from PyQt6.QtGui import QPen, QBrush, QColor,  QKeySequence, QShortcut, QPolygon
 from PyQt6.QtCore import Qt, QPointF
 
 
+YELLOW = QColor(255, 255, 0)
+RED = QColor(255, 0, 0)
 
 class MapApp(QMainWindow):
     def __init__(self):
@@ -28,7 +30,7 @@ class MapApp(QMainWindow):
         self.browse_button = QPushButton(self)
         self.browse_button.setText("Обзор")
         self.browse_button.move(470, 10)
-        self.browse_button.clicked.connect(self.browse_file)
+        self.browse_button.clicked.connect(self.browseFile)
 
         # Кнопка "Удалить объект"
         self.delete_button = QPushButton(self)
@@ -65,14 +67,14 @@ class MapApp(QMainWindow):
 
         # Горячие клавиши для сохранения и загрузки файла
         self.save_shortcut = QShortcut(QKeySequence("Ctrl+S"), self)
-        self.save_shortcut.activated.connect(self.save_file)
+        self.save_shortcut.activated.connect(self.saveFile)
 
         self.load_shortcut = QShortcut(QKeySequence(Qt.Key.Key_Return), self)
-        self.load_shortcut.activated.connect(self.enter_load)
+        self.load_shortcut.activated.connect(self.loadEnterShortcut)
 
     # Функция сохранения координат в файл 
-    def save_file(self):
-        coords = self.get_coordinates()
+    def saveFile(self):
+        coords = self.getCcoordinates()
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.FileMode.Directory)
         file_dialog.setOption(QFileDialog.Option.ShowDirsOnly)
@@ -81,21 +83,27 @@ class MapApp(QMainWindow):
         if file_path:
             file_path += "/coordinates.txt"
 
-            with open(file_path, "w") as f:
-                for obj in coords:
-                    exit_str = ""
-                    if type(obj) == list:
-                        for item in obj:
-                            if type(item) == tuple:
-                                exit_str += f"{int(item[0])} {int(item[1])} "
-                            else:
-                                exit_str = exit_str + str(int(item)) + " "
-                        f.write(str(exit_str) + "\n")
-                    else:
-                        f.write(str(obj) + "\n")
+            try:
+                with open(file_path, "w") as f:
+                    for obj in coords:
+                        exit_str = ""
+                        if type(obj) == list:
+                            for item in obj:
+                                if type(item) == tuple:
+                                    exit_str += f"{int(item[0])} {int(item[1])} "
+                                else:
+                                    exit_str = exit_str + str(int(item)) + " "
+                            f.write(str(exit_str) + "\n")
+                        else:
+                            f.write(str(obj) + "\n")
+            except IOError:
+                self.status_bar.showMessage("Ошибка записи в файл")
+        else:
+            self.status_bar.showMessage("Директория не выбрана")
+
 
     # Функция получения координат с карты
-    def get_coordinates(self):
+    def getCcoordinates(self):
         coordinates = []
         items = self.scene.items()
         for item in items:
@@ -152,31 +160,31 @@ class MapApp(QMainWindow):
             if item:
                 if self.selected_item:
                     if type(self.selected_item) == QGraphicsPolygonItem:
-                        self.selected_item.setPen(QColor(255, 0, 0))
-                        self.selected_item.setBrush(QColor(255, 0, 0))
+                        self.selected_item.setPen(RED)
+                        self.selected_item.setBrush(RED)
                     else:
-                        self.selected_item.setPen(QColor(255, 0, 0))
+                        self.selected_item.setPen(RED)
 
                 self.selected_item = item
                 if type(self.selected_item) == QGraphicsPolygonItem:
-                    self.selected_item.setPen(QColor(255, 255, 0))
-                    self.selected_item.setBrush(QColor(255, 255, 0))
+                    self.selected_item.setPen(YELLOW)
+                    self.selected_item.setBrush(YELLOW)
                 else:
-                    self.selected_item.setPen(QColor(255, 255, 0))
+                    self.selected_item.setPen(YELLOW)
 
             else:
                 if self.selected_item:
                     if type(self.selected_item) == QGraphicsPolygonItem:
                         if self.selected_item:
-                            self.selected_item.setPen(QColor(255, 255, 0))
-                            self.selected_item.setBrush(QColor(255, 255, 0))
+                            self.selected_item.setPen(YELLOW)
+                            self.selected_item.setBrush(YELLOW)
                     else:
                         if self.selected_item:
-                            self.selected_item.setPen(QColor(255, 255, 0))
+                            self.selected_item.setPen(YELLOW)
                     self.selected_item = None
                 else:
                     if self.selected_item:
-                        self.selected_item.setPen(QColor(255, 255, 0))
+                        self.selected_item.setPen(YELLOW)
                     self.selected_item = None
 
         self.draggable = False
@@ -192,33 +200,38 @@ class MapApp(QMainWindow):
             QMessageBox.warning(self, 'Предупреждение', 'Требуется выбрать объект')
 
     # Функция вызывает окно выбора файла
-    def browse_file(self):
+    def browseFile(self):
         file_path, _ = QFileDialog.getOpenFileName(self, "Выберите файл", "", "Файлы формата txt (*.txt)")
         if file_path:
             self.entry_file.setText(file_path)
-            self.read_file(file_path)
+            self.readFile(file_path)
         else:
-            QMessageBox.warning(self, "Ошибка", "Файл не выбран", QMessageBox.Ok) 
+            self.status_bar.showMessage("Файл не выбран")
 
     # Функция чтения файла и обработки ошибок 
-    def read_file(self, file_path):
+    def readFile(self, file_path):
         try:
-            data = self.load_file(file_path)
-            self.draw_data(data)
+            data = self.loadFile(file_path)
+            self.drawDataOnMap(data)
 
         except Exception as e:
             self.status_bar.showMessage("Ошибка чтения файла: " + str(e))
 
     # Фкнуция для загрузки файла по шорткату 
-    def enter_load(self):
+    def loadEnterShortcut(self):
         file = self.entry_file.text()
-        self.load_file(file)
+        try:
+            data = self.loadFile(file)
+            self.drawDataOnMap(data)
+        except Exception as e:
+            self.status_bar.showMessage("Ошибка чтения файла: " + str(e))
 
     # Функция загрузки файла и считывание координат
-    def load_file(self, file_path):
+    def loadFile(self, file_path):
         if file_path == "" or not os.path.isfile(file_path):
-            QMessageBox.warning(self, 'Предупреждение', 'Файл не выбран')
+            self.status_bar.showMessage("Не найден файл или директория")
             return {}
+        
         else:
             data_dict = {}
             try:
@@ -236,23 +249,22 @@ class MapApp(QMainWindow):
 
                 return data_dict
             except:
-                # self.status_bar.showMessage("Ошибка чтения файла")
-                QMessageBox.warning(self, 'Предупреждение', 'Не найден файл или директория')
+                self.status_bar.showMessage("Не найден файл или директория")
                 return {}
 
     # Функция добавления объектов на карту
-    def draw_data(self, data):
+    def drawDataOnMap(self, data):
         for value in data.values():
             
             if len(value) == 2:
-                pen = QPen(QColor(255, 0, 0))
+                pen = QPen(RED)
                 self.scene.addEllipse(value[0], value[1], 1, 1, pen)
             if len(value) == 4:
-                pen = QPen(QColor(255, 0, 0))
+                pen = QPen(RED)
                 self.scene.addLine(value[0], value[1], value[2], value[3], pen)
             if len(value) >= 6:
-                pen = QPen(QColor(255, 0, 0))
-                brush = QBrush(QColor(255, 0, 0))
+                pen = QPen(RED)
+                brush = QBrush(RED)
                 points = []
 
                 for i in range(len(value)):
