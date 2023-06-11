@@ -8,7 +8,7 @@ RED = QColor(255, 0, 0)
 
 
 # Класс для работы с картой
-class myMap():
+class Map():
     def __init__(self, map_canvas, scene) :
         self.selected_item= None
         self.map_canvas = map_canvas
@@ -67,14 +67,7 @@ class myMap():
             if event.button() == Qt.MouseButton.LeftButton:
                 pos = event.pos()
                 item = self.map_canvas.itemAt(pos)
-                if item is None:
-                    if self.selected_item is not None:
-                        self.selected_item.setPen(RED)
-                        if isinstance(self.selected_item, QGraphicsPolygonItem):
-                            self.selected_item.setBrush(RED)
-                        self.selected_item = None
-
-                elif item:
+                if bool(item):
                     if self.selected_item:
                         self.selected_item.setPen(RED)
                         if isinstance(self.selected_item, QGraphicsPolygonItem):
@@ -84,15 +77,16 @@ class myMap():
                     self.selected_item.setPen(YELLOW)
                     if isinstance(self.selected_item, QGraphicsPolygonItem):
                         self.selected_item.setBrush(YELLOW)
-
                 else:
                     if self.selected_item:
-                        self.selected_item.setPen(YELLOW)
+                        self.selected_item.setPen(RED)
                         if isinstance(self.selected_item, QGraphicsPolygonItem):
-                            self.selected_item.setBrush(YELLOW)
+                            self.selected_item.setBrush(RED)
+                    self.selected_item = None
 
                 self.draggable = False
                 self.previous_pos = None
+
         except Exception as error:
             print('Произошла ошибка в mouseReleaseEvent:', error)
 

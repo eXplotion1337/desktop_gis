@@ -4,8 +4,8 @@ from PyQt6.QtWidgets import QMainWindow, QGraphicsScene
 from PyQt6.QtGui import QKeySequence, QShortcut
 from PyQt6.QtCore import Qt
 
-from Map.Map import myMap
-from FileManager.FileManager import myFileManager
+from Map.Map import Map
+from FileManager.FileManager import FileManager
 
 # Получение UI из файла 
 _DIR_PATH = os.path.dirname(__file__)
@@ -26,8 +26,8 @@ class MapApp(QMainWindow, FORM_CLASS):
         self.scale_factor = 1.0
 
         # Экземпляры классов для  работы с картой и файлами
-        self.Map = myMap(self.map_canvas, self.scene)
-        self.FileManager = myFileManager(self)
+        self.Map = Map(self.map_canvas, self.scene)
+        self.FileManager = FileManager(self)
 
         # Кнопка "Обзор"
         self.browse_button.clicked.connect(self.drawObject)

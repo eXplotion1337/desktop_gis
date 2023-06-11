@@ -4,7 +4,7 @@ from PyQt6.QtWidgets import  QFileDialog
 
 
 # Класс для работы с файлами 
-class myFileManager():
+class FileManager():
     def __init__(self, map) :
         self.map_canvas = map
 
