@@ -10,6 +10,10 @@ class myFileManager():
 
     # Функция сохранения файла
     def saveFile(self, coords):
+        if not coords:
+            self.map_canvas.statusBar.showMessage("Ошибка: координаты не найдены")
+            return
+        
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.FileMode.Directory)
         file_dialog.setOption(QFileDialog.Option.ShowDirsOnly)
