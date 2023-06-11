@@ -35,7 +35,7 @@ class myMap():
             scene_pos = self.map_canvas.mapToScene(QPoint(cursor_pos.x(), cursor_pos.y()))
             self.map_canvas.centerOn(scene_pos)
         except Exception as e:
-            print("Ошибка выполнения приближения: ", str(e))
+            print("Произошла ошибка в wheelEvent", str(e))
 
     # Функция отвечает за обработку события клика мыши
     def mousePressEvent(self, event):
@@ -44,7 +44,7 @@ class myMap():
                 self.draggable = True
                 self.previous_pos = event.pos()
         except Exception as e:
-            print("Error occurred:", e)
+            print("Произошла ошибка в mousePressEvent:", e)
 
     #  Функция отвечает за обработку события перемещения мыши при зажатой левой кнопке
     def mouseMoveEvent(self, event):
@@ -59,47 +59,53 @@ class myMap():
 
                 self.previous_pos = cursor_pos
         except Exception as e:
-            print(f"An error occurred in mouseMoveEvent: {e}")
+            print(f"Произошла ошибка в mouseMoveEvent: {e}")
 
     # Функция вызывается, когда пользователь отпускает кнопку мыши (красим элементы)
     def mouseReleaseEvent(self, event):
-        if event.button() == Qt.MouseButton.LeftButton:
-            pos = event.pos()
-            item = self.map_canvas.itemAt(pos)
-            if item is None:
-                if self.selected_item is not None:
-                    self.selected_item.setPen(RED)
-                    if isinstance(self.selected_item, QGraphicsPolygonItem):
-                        self.selected_item.setBrush(RED)
-                    self.selected_item = None
+        try:
+            if event.button() == Qt.MouseButton.LeftButton:
+                pos = event.pos()
+                item = self.map_canvas.itemAt(pos)
+                if item is None:
+                    if self.selected_item is not None:
+                        self.selected_item.setPen(RED)
+                        if isinstance(self.selected_item, QGraphicsPolygonItem):
+                            self.selected_item.setBrush(RED)
+                        self.selected_item = None
 
-            elif item:
-                if self.selected_item:
-                    self.selected_item.setPen(RED)
-                    if isinstance(self.selected_item, QGraphicsPolygonItem):
-                        self.selected_item.setBrush(RED)
+                elif item:
+                    if self.selected_item:
+                        self.selected_item.setPen(RED)
+                        if isinstance(self.selected_item, QGraphicsPolygonItem):
+                            self.selected_item.setBrush(RED)
 
-                self.selected_item = item
-                self.selected_item.setPen(YELLOW)
-                if isinstance(self.selected_item, QGraphicsPolygonItem):
-                    self.selected_item.setBrush(YELLOW)
-
-            else:
-                if self.selected_item:
+                    self.selected_item = item
                     self.selected_item.setPen(YELLOW)
                     if isinstance(self.selected_item, QGraphicsPolygonItem):
                         self.selected_item.setBrush(YELLOW)
 
-            self.draggable = False
-            self.previous_pos = None
+                else:
+                    if self.selected_item:
+                        self.selected_item.setPen(YELLOW)
+                        if isinstance(self.selected_item, QGraphicsPolygonItem):
+                            self.selected_item.setBrush(YELLOW)
+
+                self.draggable = False
+                self.previous_pos = None
+        except Exception as error:
+            print('Произошла ошибка в mouseReleaseEvent:', error)
 
     # Функция удаления выбранного объекта
     def deleteObject(self):
-        if self.selected_item:
-            self.scene.removeItem(self.selected_item)
-            self.selected_item= None
-        else:
-            QMessageBox.warning(None, 'Предупреждение', 'Требуется выбрать объект')
+        try:
+            if self.selected_item:
+                self.scene.removeItem(self.selected_item)
+                self.selected_item = None
+            else:
+                QMessageBox.warning(None, 'Предупреждение', 'Требуется выбрать объект')
+        except Exception as e:
+            print("Ошибка удаления объекта:", e)
 
     # Функция отрисовки объектов на карте
     def drawDataOnMap(self, data):
