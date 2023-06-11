@@ -66,13 +66,13 @@ class myMap():
         if event.button() == Qt.MouseButton.LeftButton:
             pos = event.pos()
             item = self.map_canvas.itemAt(pos)
-            if type(item) == None:
+            if item is None:
                 if self.selected_item is not None:
                     self.selected_item.setPen(RED)
                     if isinstance(self.selected_item, QGraphicsPolygonItem):
                         self.selected_item.setBrush(RED)
 
-            if item:
+            elif item:
                 if self.selected_item:
                     self.selected_item.setPen(RED)
                     if isinstance(self.selected_item, QGraphicsPolygonItem):
