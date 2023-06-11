@@ -84,7 +84,11 @@ class myFileManager():
                     for i in range(len(lines)):
                         if any(c.isalpha() for c in lines[i]): # проверяем, содержит ли строка буквы
                             continue
-                        data_dict[i+1] = [int(x) for x in re.findall(r'\d+', lines[i])]
+                        array = [int(x) for x in re.findall(r'\d+', lines[i])]
+                        if len(array) % 2 != 0: 
+                            continue
+                        data_dict[i+1] = array
+
 
                 if len(lines) > len(data_dict):
                     self.map_canvas.statusBar.showMessage('Обратите внимание на правильность введеных данных, не все объекты удалось загрузить')
