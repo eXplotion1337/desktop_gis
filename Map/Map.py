@@ -3,6 +3,7 @@ from PyQt6.QtWidgets import QMessageBox,  QGraphicsLineItem, QGraphicsEllipseIte
 from PyQt6.QtGui import QPen, QBrush, QColor,  QPolygonF, QTransform
 from PyQt6.QtCore import Qt, QPointF, QPoint
 
+# Константы цветов 
 YELLOW = QColor(255, 255, 0)
 RED = QColor(255, 0, 0)
 
@@ -71,6 +72,7 @@ class myMap():
                     self.selected_item.setPen(RED)
                     if isinstance(self.selected_item, QGraphicsPolygonItem):
                         self.selected_item.setBrush(RED)
+                    self.selected_item = None
 
             elif item:
                 if self.selected_item:
