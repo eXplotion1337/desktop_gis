@@ -1,5 +1,4 @@
-from PyQt6 import uic
-from PyQt6.QtWidgets import QMessageBox,  QGraphicsLineItem, QGraphicsEllipseItem, QGraphicsPolygonItem, QGraphicsView
+from PyQt6.QtWidgets import QMessageBox,  QGraphicsLineItem, QGraphicsEllipseItem, QGraphicsPolygonItem
 from PyQt6.QtGui import QPen, QBrush, QColor,  QPolygonF, QTransform
 from PyQt6.QtCore import Qt, QPointF, QPoint
 
